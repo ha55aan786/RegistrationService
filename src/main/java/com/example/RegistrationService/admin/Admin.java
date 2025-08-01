@@ -1,9 +1,7 @@
 package com.example.RegistrationService.admin;
 
 import jakarta.persistence.*;
-import lombok.Data;
 
-@Data
 @Entity(name="_admin")
 public class Admin {
 
