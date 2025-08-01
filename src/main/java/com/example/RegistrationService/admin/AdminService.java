@@ -25,8 +25,12 @@ public class AdminService {
         }
         }
 
-    public void deleteAdmin(Long id){
-        adminRepository.deleteById(id);
+    public void deleteAdmin(Long id) throws Exception {
+        try {
+            adminRepository.deleteById(id);
+        } catch (Exception e) {
+            throw new Exception(e);
+        }
     }
 
     public void findAdmin(Long id){
