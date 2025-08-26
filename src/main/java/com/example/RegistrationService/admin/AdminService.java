@@ -33,7 +33,9 @@ public class AdminService {
         }
     }
 
-    public void findAdmin(Long id){
-        adminRepository.findById(id);
+    public Admin findAdmin(Long id) throws Exception {
+        return adminRepository.findById(id)
+                .orElseThrow(() -> new Exception("Admin not found with ID: " + id));
     }
+
 }
