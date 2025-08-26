@@ -25,4 +25,12 @@ public class UserService {
             }
         }
 
+        public void deleteUser(Long id) throws Exception {
+           try {
+               userRepository.deleteById(id);
+           } catch (Exception e) {
+               throw new Exception(e);
+           }
+        }
+
 }
