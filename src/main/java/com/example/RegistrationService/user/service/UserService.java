@@ -1,10 +1,12 @@
 package com.example.RegistrationService.user.service;
 
 import com.example.RegistrationService.dto.LoginRequestDTO;
+import com.example.RegistrationService.dto.RegisterRequestDTO;
 import com.example.RegistrationService.dto.UserDTO;
 import com.example.RegistrationService.genericExceptions.EmailAlreadyExistsException;
 import com.example.RegistrationService.user.entity.User;
 import com.example.RegistrationService.user.repository.UserRepository;
+import com.example.RegistrationService.utility.JwtUtility;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
@@ -22,7 +24,7 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    public void addUser(UserDTO userDto) {
+    public void addUser(RegisterRequestDTO userDto) {
         try {
             User user = new User();
 
@@ -92,7 +94,7 @@ public class UserService {
         }
     }
 
-    public void loginUser(LoginRequestDTO loginRequest) throws Exception {
+    public String loginUser(LoginRequestDTO loginRequest) throws Exception {
         try {
             User user = userRepository.findByUsername(loginRequest.getUsername());
             if (Objects.isNull(user)) {
@@ -105,5 +107,7 @@ public class UserService {
         } catch (Exception e) {
             throw new Exception(e);
         }
+
+        return JwtUtility.generateToken("user.getUsername()");
     }
 }
