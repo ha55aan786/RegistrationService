@@ -8,6 +8,7 @@ import com.example.RegistrationService.user.entity.User;
 import com.example.RegistrationService.user.repository.UserRepository;
 import com.example.RegistrationService.utility.JwtUtility;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -19,20 +20,23 @@ import java.util.Optional;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    UserService(UserRepository userRepository) {
+    UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public void addUser(RegisterRequestDTO userDto) {
         try {
+            String encodedPassword = passwordEncoder.encode(userDto.getPassword());
             User user = new User();
 
             user.setUsername(userDto.getUsername());
             user.setEmail(userDto.getEmail());
             user.setFirstName(userDto.getFirstName());
             user.setLastName(userDto.getLastName());
-            user.setPassword(userDto.getPassword());
+            user.setPassword(encodedPassword);
 
             userRepository.save(user);
         } catch (DataIntegrityViolationException e) {
@@ -100,7 +104,8 @@ public class UserService {
             if (Objects.isNull(user)) {
                 throw new Exception("Invalid Username");
             }
-            if (!loginRequest.getPassword().equalsIgnoreCase(user.getPassword())) {
+            boolean isCorrectPassword = passwordEncoder.matches(loginRequest.getPassword(), user.getPassword());
+            if (!isCorrectPassword) {
                 throw new Exception ("Invalid Password");
             }
 
