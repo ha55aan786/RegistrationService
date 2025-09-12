@@ -92,7 +92,7 @@ public class RegistrationController {
             String loginSuccess = userService.loginUser(loginRequest);
             if (!Objects.isNull(loginSuccess)) {
                 logger.info("login successfully");
-                return ResponseEntity.ok("Login successful"+ "jwt token = " + loginSuccess);
+                return ResponseEntity.ok("Login successful"+ "\njwt token = " + loginSuccess);
             } else {
                 logger.error("Invalid credentials for login");
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");

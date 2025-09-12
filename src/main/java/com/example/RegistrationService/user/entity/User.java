@@ -8,8 +8,7 @@ import lombok.Data;
 public class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_seq")
-    @SequenceGenerator(name = "user_seq", sequenceName = "user_sequence", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "email", nullable = false, unique = true)
@@ -25,11 +24,3 @@ public class User {
     private boolean isAdmin = false;
 
 }
-/*
-* entity:
-* dto:
-* registration controller, login controller
-* registration service, login service
-*
-*
-* */
