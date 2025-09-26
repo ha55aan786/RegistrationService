@@ -16,8 +16,8 @@ public class JwksController {
         JwkKey key = new JwkKey(
                 "RSA",
                 "AQAB",
-                "A7f2kL9xQ1wZ3rT0",
-                "sxQvZKVae0YbH_pqiA3z06JB8rg-UJwgbkziz77brpPq-3kBlU68Hwdhj_xA-heCvNBvqki0A2vTdMfvOeQZWh952cTgekrDD1PyBRu90zhJ9IFF5XN9LMJl3AXfRibBbx44CtCjqjguSUhYbJGB3IPGT5Ln9EYQg52HY-smuRiUeFmgdCBm1Y_20tIjy7cu3_YM3vx2YzsaFiIVd9uXmGYi950j-w1660WsUzi9NbnOouaprQCdpjsx5YoVi3bNKNwiZd581LBdNuxm7Hvu0Q4ULtG1aH7nZgl7EZ2WdmsOylo0DLNKMWvgfWPHx-Rs5gN9Si8D6OcAqCo9SAcC0Q"
+                "2e16ad86-e49b-4fe2-b8f4-e1570fccd266",
+                "wPJqyU08GpgBcwrkTxMkMIAyP7_XyhRf-NGX14136LEJYPcN9XzIVi5kTG5ZHoYkjXJR5s8ez706PMbm-MBdRdQv04Y7WqH35ku8WoX0XSq4gRsGWbTrOBB17DHDoXNEJZtueaiONtq4tsEjGouwUg0kqPGOBu2e66A3OmWVo0zlCVwWfVP736iQXd3MVLlTfA65ssiAx_Pin1MNQDJapIcq4oE_cA7JveYCVEzhuPBd1RzwbC-t8_Q6DlwZq1Xb0K4HSLFb2lI8HtXdwHu7gNMu57ezKur8yc-g5sy0apNDc00IWf-Z17OEWMG6tnArG9_XWCNTpsGhOOJp_xuxZQ"
         );
         return new JwkSet(List.of(key));
     }

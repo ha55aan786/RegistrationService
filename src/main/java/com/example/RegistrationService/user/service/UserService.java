@@ -99,8 +99,9 @@ public class UserService {
     }
 
     public String loginUser(LoginRequestDTO loginRequest) throws Exception {
+        User user ;
         try {
-            User user = userRepository.findByUsername(loginRequest.getUsername());
+            user = userRepository.findByUsername(loginRequest.getUsername());
             if (Objects.isNull(user)) {
                 throw new Exception("Invalid Username");
             }
@@ -113,6 +114,6 @@ public class UserService {
             throw new Exception(e);
         }
 
-        return JwtUtility.generateToken("user.getUsername()");
+        return JwtUtility.generateToken(user.getUsername());
     }
 }

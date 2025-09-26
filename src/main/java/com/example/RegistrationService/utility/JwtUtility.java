@@ -1,27 +1,52 @@
 package com.example.RegistrationService.utility;
 
+import com.nimbusds.jose.*;
+import com.nimbusds.jose.crypto.*;
+import com.nimbusds.jwt.*;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.security.Keys;
+import java.nio.file.*;
+import java.security.*;
+import java.security.spec.*;
+import java.util.*;
 
-import java.security.Key;
-import java.util.Date;
-
+@Component
 public class JwtUtility {
 
-    // Secret key for signing (should be kept safe, ideally in env variable or config server)
-    private static final Key secretKey = Keys.secretKeyFor(SignatureAlgorithm.HS256);
+    @Value("${jwt.key-id}")
+    private static String keyId;
 
-    // Generate JWT token
-    public static String generateToken(String username) {
-        long expirationTimeMs = 1000 * 60 * 60; // 1 hour
+    public static String generateToken(String username) throws Exception {
+        // 1. Read private key from PEM
+        String pem = Files.readString(Paths.get("private_key.pem"))
+                .replace("-----BEGIN PRIVATE KEY-----", "")
+                .replace("-----END PRIVATE KEY-----", "")
+                .replaceAll("\\s", "");
+        byte[] decoded = Base64.getDecoder().decode(pem);
 
-        return Jwts.builder()
-                .setSubject(username)
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + expirationTimeMs))
-                .signWith(secretKey)
-                .compact();
+        KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+        PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(decoded);
+        PrivateKey privateKey = keyFactory.generatePrivate(keySpec);
+
+        // 2. Create JWT claims
+        JWTClaimsSet claims = new JWTClaimsSet.Builder()
+                .subject(username)
+                .issuer("registration-service")
+                .expirationTime(new Date(System.currentTimeMillis() + 3600_000)) // 1 hr
+                .build();
+
+        // 3. Sign with RS256
+        JWSSigner signer = new RSASSASigner(privateKey);
+
+        SignedJWT signedJWT = new SignedJWT(
+                new JWSHeader.Builder(JWSAlgorithm.RS256)
+                        .keyID(keyId) // match kid in JWKS!
+                        .build(),
+                claims
+        );
+
+        signedJWT.sign(signer);
+        return signedJWT.serialize();
     }
 }
