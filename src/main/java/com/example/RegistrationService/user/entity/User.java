@@ -21,6 +21,10 @@ public class User {
     private String lastName;
     private String password;
 
+    @Column(name = "invalid_tries")
+    private int invalidTries;
+    @Column(name="is_active")
+    private boolean isActive;
     private boolean isAdmin = false;
 
 }
