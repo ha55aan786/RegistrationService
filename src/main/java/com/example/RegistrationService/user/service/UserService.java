@@ -7,6 +7,9 @@ import com.example.RegistrationService.genericExceptions.EmailAlreadyExistsExcep
 import com.example.RegistrationService.user.entity.User;
 import com.example.RegistrationService.user.repository.UserRepository;
 import com.example.RegistrationService.utility.JwtUtility;
+import com.example.RegistrationService.utility.MailSenderUtility;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -26,6 +29,8 @@ public class UserService {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
     }
+
+    private static final Logger logger = LoggerFactory.getLogger(UserService.class);
 
     public void addUser(RegisterRequestDTO userDto) {
         try {
@@ -105,8 +110,18 @@ public class UserService {
             if (Objects.isNull(user)) {
                 throw new Exception("Invalid Username");
             }
+            if  (!user.isActive()) {
+                logger.warn("Account blocked for " + user.getUsername());
+                throw new Exception("Account blocked due to multiple invalid tries");
+            }
             boolean isCorrectPassword = passwordEncoder.matches(loginRequest.getPassword(), user.getPassword());
             if (!isCorrectPassword) {
+                user.setInvalidTries(user.getInvalidTries() + 1);
+                if (user.getInvalidTries() > 5) {
+                    user.setActive(false);
+                    MailSenderUtility.callMailSenderService(JwtUtility.generateToken(user.getUsername()), "Account blocked", user.getEmail());
+                }
+                userRepository.save(user);
                 throw new Exception ("Invalid Password");
             }
 
@@ -114,6 +129,8 @@ public class UserService {
             throw new Exception(e);
         }
 
+        user.setInvalidTries(0);
+        userRepository.save(user);
         return JwtUtility.generateToken(user.getUsername());
     }
 }

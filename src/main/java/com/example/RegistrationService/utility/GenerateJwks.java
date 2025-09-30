@@ -33,4 +33,8 @@ public class GenerateJwks {
 
         return mapper.writeValueAsString(jwkSet.toJSONObject());
     }
+
+    public static void main(String[] args) throws Exception {
+        System.out.println(createJWKS());
+    }
 }

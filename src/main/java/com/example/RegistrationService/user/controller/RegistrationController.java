@@ -91,22 +91,27 @@ public class RegistrationController {
             }
             String loginSuccess = userService.loginUser(loginRequest);
             if (!Objects.isNull(loginSuccess)) {
-                logger.info("login successfully");
-                return ResponseEntity.ok("Login successful"+ "\njwt token = " + loginSuccess);
+                logger.info("login successfully, token = " + loginSuccess);
+                return ResponseEntity.ok(loginSuccess);
             } else {
-                logger.error("Invalid credentials for login");
+                logger.error("Invalid credentials for login for username");
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
             }
         } catch (Exception e) {
             if (e.getMessage().contains("Invalid Username")) {
-                logger.error("invalid username for login");
+                logger.error("invalid username for login" + e.getMessage() + " for username " + loginRequest.getUsername());
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                        .body("An error occurred while logging in: " + e.getMessage());
+                        .body("An error occurred while login due to invalid username");
             }
             if (e.getMessage().contains("Invalid Password")) {
-                logger.error("invalid Password for login");
+                logger.error("invalid Password for login " + e.getMessage() +  " for username " + loginRequest.getUsername());
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                        .body("An error occurred while logging in: " + e.getMessage());
+                        .body("An error occurred while login due to invalid password");
+            }
+            if (e.getMessage().contains("Account blocked")) {
+                logger.error("Account blocked due to multiple invalid tries " + e.getMessage() +  " for username " + loginRequest.getUsername());
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body("Account blocked due to multiple invalid tries");
             }
 
             logger.error("Internal server error for login");
