@@ -15,9 +15,9 @@ import java.util.*;
 public class JwtUtility {
 
     @Value("${jwt.key-id}")
-    private static String keyId;
+    private String keyId;
 
-    public static String generateToken(String username) throws Exception {
+    public  String generateToken(String username) throws Exception {
         // 1. Read private key from PEM
         String pem = Files.readString(Paths.get("private_key.pem"))
                 .replace("-----BEGIN PRIVATE KEY-----", "")
@@ -41,7 +41,7 @@ public class JwtUtility {
 
         SignedJWT signedJWT = new SignedJWT(
                 new JWSHeader.Builder(JWSAlgorithm.RS256)
-                        .keyID(keyId) // match kid in JWKS!
+                        .keyID(keyId)
                         .build(),
                 claims
         );

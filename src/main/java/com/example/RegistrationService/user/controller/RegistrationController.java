@@ -113,6 +113,17 @@ public class RegistrationController {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                         .body("Account blocked due to multiple invalid tries");
             }
+            if (e.getMessage().contains("Mail Sender API") && e.getMessage().contains("Authorization is required")) {
+                logger.error("External API Error: Authorization is required while hitting the Mail Sender Service");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body("External API Error: Authorization is required while hitting the Mail Sender Service");
+            }
+
+            if (e.getMessage().contains("Mail Sender API") && e.getMessage().contains("invalid body")) {
+                logger.error("External API Error: Invalid Email body/structure is send to Mail Sender Service");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body("External API Error: Invalid Email body/structure is send to Mail Sender Service");
+            }
 
             logger.error("Internal server error for login");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
