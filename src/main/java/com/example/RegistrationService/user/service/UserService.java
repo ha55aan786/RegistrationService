@@ -22,12 +22,16 @@ import java.util.Optional;
 @Service
 public class UserService {
 
+    private final MailSenderUtility mailSenderUtility;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtUtility jwtUtility;
 
-    UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, MailSenderUtility mailSenderUtility, JwtUtility jwtUtility) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.mailSenderUtility = mailSenderUtility;
+        this.jwtUtility = jwtUtility;
     }
 
     private static final Logger logger = LoggerFactory.getLogger(UserService.class);
@@ -112,6 +116,7 @@ public class UserService {
             }
             if  (!user.isActive()) {
                 logger.warn("Account blocked for " + user.getUsername());
+                mailSenderUtility.callMailSenderService(jwtUtility.generateToken(user.getUsername()), "Account blocked", user.getEmail());
                 throw new Exception("Account blocked due to multiple invalid tries");
             }
             boolean isCorrectPassword = passwordEncoder.matches(loginRequest.getPassword(), user.getPassword());
@@ -119,7 +124,7 @@ public class UserService {
                 user.setInvalidTries(user.getInvalidTries() + 1);
                 if (user.getInvalidTries() > 5) {
                     user.setActive(false);
-                    MailSenderUtility.callMailSenderService(JwtUtility.generateToken(user.getUsername()), "Account blocked", user.getEmail());
+                    mailSenderUtility.callMailSenderService(jwtUtility.generateToken(user.getUsername()), "Account blocked", user.getEmail());
                 }
                 userRepository.save(user);
                 throw new Exception ("Invalid Password");
@@ -131,6 +136,6 @@ public class UserService {
 
         user.setInvalidTries(0);
         userRepository.save(user);
-        return JwtUtility.generateToken(user.getUsername());
+        return jwtUtility.generateToken(user.getUsername());
     }
 }
